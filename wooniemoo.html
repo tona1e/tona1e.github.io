@@ -113,7 +113,10 @@
             // If we already have a token, we don't need a new one.
             if (accessToken) return accessToken;
 
-            const authUrl = 'https://open.tiktokapis.com/v2/oauth/token/';
+            // Using a CORS proxy to bypass browser security restrictions for client-side API calls.
+            const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
+            const tiktokAuthUrl = 'https://open.tiktokapis.com/v2/oauth/token/';
+            const fullAuthUrl = proxyUrl + tiktokAuthUrl;
             
             const params = new URLSearchParams();
             params.append('client_key', CLIENT_KEY);
@@ -121,7 +124,7 @@
             params.append('grant_type', 'client_credentials');
 
             try {
-                const response = await fetch(authUrl, {
+                const response = await fetch(fullAuthUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -175,6 +178,7 @@
                 }
                 
                 // Then, use the token to search for videos using the Research API
+                // NOTE: We do NOT need the proxy for this second call, as the token provides authorization.
                 const searchUrl = 'https://open.tiktokapis.com/v2/research/video/query/';
                 
                 const searchPayload = {
@@ -283,5 +287,3 @@
     </script>
 </body>
 </html>
-```
-
